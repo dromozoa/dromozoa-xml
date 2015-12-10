@@ -16,10 +16,10 @@
 -- along with dromozoa-xml.  If not, see <http://www.gnu.org/licenses/>.
 
 local sequence_writer = require "dromozoa.commons.sequence_writer"
-local xml_escape = require "dromozoa.commons.xml_escape"
-local xml_parser = require "dromozoa.commons.xml_parser"
-local xml_selector = require "dromozoa.commons.xml_selector"
-local xml_write = require "dromozoa.commons.xml_write"
+local xml_escape = require "dromozoa.xml.xml_escape"
+local xml_parser = require "dromozoa.xml.xml_parser"
+local xml_selector = require "dromozoa.xml.xml_selector"
+local xml_write = require "dromozoa.xml.xml_write"
 
 local function parse(this)
   return xml_parser(this):apply()
