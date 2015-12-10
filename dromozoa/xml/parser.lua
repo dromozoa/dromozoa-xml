@@ -21,8 +21,8 @@ local string_matcher = require "dromozoa.commons.string_matcher"
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 local utf8 = require "dromozoa.commons.utf8"
-local xml_element = require "dromozoa.xml.xml_element"
-local xml_node_list = require "dromozoa.xml.xml_node_list"
+local xml_element = require "dromozoa.xml.element"
+local xml_node_list = require "dromozoa.xml.node_list"
 
 local ws = "[ \t\r\n]*"
 local zero_width_no_break_space = string.char(0xef, 0xbb, 0xbf)

@@ -18,7 +18,7 @@
 local empty = require "dromozoa.commons.empty"
 local ipairs = require "dromozoa.commons.ipairs"
 local pairs = require "dromozoa.commons.pairs"
-local xml_escape = require "dromozoa.xml.xml_escape"
+local xml_escape = require "dromozoa.xml.escape"
 
 local function write(out, v)
   local t = type(v)
