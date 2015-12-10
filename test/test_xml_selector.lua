@@ -16,8 +16,7 @@
 -- along with dromozoa-xml.  If not, see <http://www.gnu.org/licenses/>.
 
 local sequence = require "dromozoa.commons.sequence"
-local xml = require "dromozoa.commons.xml"
-local xml_selector = require "dromozoa.commons.xml_selector"
+local xml = require "dromozoa.xml"
 
 local e1 = xml.decode("<E/>")
 local e2 = xml.decode("<F foo='bar'/>")

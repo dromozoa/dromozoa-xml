@@ -18,7 +18,7 @@
 local dumper = require "dromozoa.commons.dumper"
 local equal = require "dromozoa.commons.equal"
 local json = require "dromozoa.commons.json"
-local xml = require "dromozoa.commons.xml"
+local xml = require "dromozoa.xml"
 
 local a, b = xml.escape("<>&\"'")
 assert(a == "&lt;&gt;&amp;&quot;&apos;")
