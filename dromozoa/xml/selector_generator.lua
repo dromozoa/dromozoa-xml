@@ -24,7 +24,7 @@ local attr = element.attr
 local class = {
   [","] = function (_, a, b)
     return function (...)
-      return b(...) or a(...)
+      return a(...) or b(...)
     end
   end;
 
@@ -53,7 +53,7 @@ local class = {
 
   [""] = function (_, a, b)
     return function (...)
-      return b(...) and a(...)
+      return a(...) and b(...)
     end
   end;
 

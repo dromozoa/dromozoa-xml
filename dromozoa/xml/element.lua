@@ -35,10 +35,7 @@ end
 function class:attr(name)
   local value = self[2][name]
   if value ~= nil then
-    local t = type(value)
-    if t == "number" then
-      return ("%.17g"):format(value)
-    elseif t == "table" then
+    if type(value) == "table" then
       return table.concat(value, " ")
     else
       return tostring(value)
@@ -66,13 +63,10 @@ function class:write(out)
   else
     out:write(">")
     for node in class.each(self) do
-      local t = type(node)
-      if t == "number" then
-        out:write(xml.escape(("%.17g"):format(node)))
-      elseif t ~= "table" then
-        out:write(xml.escape(tostring(node)))
-      else
+      if type(node) == "table" then
         class.write(node, out)
+      else
+        out:write(xml.escape(tostring(node)))
       end
     end
     out:write("</" .. name .. ">")
@@ -80,12 +74,13 @@ function class:write(out)
   return out
 end
 
+function class:encode()
+  return class.write(self, sequence_writer()):concat()
+end
+
 function class:write_text(out)
   for node in class.each(self) do
-    local t = type(node)
-    if t == "number" then
-      out:write(("%.17g"):format(value))
-    elseif t ~= "table" then
+    if type(node) ~= "table" then
       out:write(tostring(node))
     end
   end
@@ -115,11 +110,8 @@ end
 
 local metatable = {
   __index = class;
+  __tostring = class.encode;
 }
-
-function metatable:__tostring()
-  return class.write(self, sequence_writer()):concat()
-end
 
 return setmetatable(class, {
   __call = function (_, name, attrs, content)

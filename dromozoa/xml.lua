@@ -15,7 +15,6 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-xml.  If not, see <http://www.gnu.org/licenses/>.
 
-local sequence_writer = require "dromozoa.commons.sequence_writer"
 local xml = require "dromozoa.commons.xml"
 local element = require "dromozoa.xml.element"
 local parser = require "dromozoa.xml.parser"
@@ -34,7 +33,7 @@ local class = {
 }
 
 function class.encode(v)
-  return element.write(v, sequence_writer()):concat()
+  return element.encode(v)
 end
 
 function class.decode(s)
