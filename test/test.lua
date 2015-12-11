@@ -18,6 +18,7 @@
 local dumper = require "dromozoa.commons.dumper"
 local equal = require "dromozoa.commons.equal"
 local json = require "dromozoa.commons.json"
+local shell = require "dromozoa.commons.shell"
 local xml = require "dromozoa.xml"
 
 local a, b = xml.escape("<>&\"'")
@@ -206,3 +207,20 @@ assert(doc:query("[foo][bar][baz]"):text() == "qux")
 assert(doc:query_all("p"):text() == "foobarbazqux")
 assert(doc:query_all("p.a"):text() == "barbaz")
 assert(doc:query_all("html > *"):query_all("* > title, * > p"):query(".b"):text() == "baz")
+
+local source =
+{ "foo", { a1 = "foo\"bar", a2 = 42, a3 = true }, {
+  { "bar", { a1 = "<baz'qux>", a2 = 69, a3 = false }, {
+    { "baz", {}, { "あいうえお" } },
+    { "qux", { a2 = 666 }, { "かきくけこ" } },
+  }}
+}}
+
+local result = assert(shell.eval("xmllint --encode UTF-8 -", xml.encode(source)))
+-- print(result)
+assert(equal(xml.decode(xml.encode(source)), xml.decode(result)))
+
+local nodes = xml.node_list():push(source)
+assert(nodes:query("baz")[3][1] == "あいうえお")
+
+

@@ -17,13 +17,15 @@
 
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
+local element = require "dromozoa.xml.element"
 local write = require "dromozoa.xml.write"
 
 local class = {}
 
 function class:write_text(out)
   for node in self:each() do
-    node:write_text(out)
+    -- maybe text?
+    element.write_text(node, out)
   end
   return out
 end
@@ -36,7 +38,7 @@ function class:query(s)
   local result
   for node in self:each() do
     if type(node) == "table" then
-      result, s = node:query(s)
+      result, s = element.query(node, s)
       if result then
         return result, s
       end
@@ -48,7 +50,7 @@ function class:query_all(s)
   local result
   for node in self:each() do
     if type(node) == "table" then
-      result, s = node:query_all(s, result)
+      result, s = element.query_all(node, s, result)
     end
   end
   return result, s

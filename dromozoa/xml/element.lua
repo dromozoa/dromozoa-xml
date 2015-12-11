@@ -31,7 +31,14 @@ function class:name()
 end
 
 function class:attr(name)
-  return self[2][name]
+  local value = self[2][name]
+  if value ~= nil then
+    if type(value) == "number" then
+      return ("%.17g"):format(value)
+    else
+      return tostring(value)
+    end
+  end
 end
 
 function class:each()
@@ -41,11 +48,10 @@ end
 function class:write_text(out)
   for i, node in ipairs(self[3]) do
     local t = type(node)
-    if t ~= "table" then
-      if t == "number" then
-      else
-        out:write(node)
-      end
+    if t == "number" then
+      out:write(("%.17g"):format(value))
+    elseif t ~= "table" then
+      out:write(tostring(node))
     end
   end
   return out

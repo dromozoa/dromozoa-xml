@@ -16,21 +16,10 @@
 -- along with dromozoa-xml.  If not, see <http://www.gnu.org/licenses/>.
 
 local split = require "dromozoa.commons.split"
+local element = require "dromozoa.xml.element"
 
-local function name(element)
-  return element[1]
-end
-
-local function attr(element, name)
-  local u = element[2][name]
-  if u ~= nil then
-    if type(u) == "number" then
-      return ("%.17g"):format(u)
-    else
-      return tostring(u)
-    end
-  end
-end
+local name = element.name
+local attr = element.attr
 
 local class = {
   [","] = function (_, a, b)

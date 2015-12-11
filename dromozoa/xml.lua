@@ -28,11 +28,11 @@ local function parse(this)
 end
 
 local class = {
-  write = write;
-  parse = parse;
-  selector = selector;
   element = element;
   node_list = node_list;
+  parse = parse;
+  write = write;
+  selector = selector;
 }
 
 function class.encode(v)
@@ -48,7 +48,6 @@ function class.decode(s)
 end
 
 element.super = class
-node_list.super = class
 
 return setmetatable(class, {
   __index = xml;
