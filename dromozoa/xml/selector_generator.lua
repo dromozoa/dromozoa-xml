@@ -17,6 +17,14 @@
 
 local split = require "dromozoa.commons.split"
 
+local function name(element)
+  return element[1]
+end
+
+local function attr(element, name)
+  return element[2][name]
+end
+
 local class = {
   [","] = function (_, a, b)
     return function (...)
@@ -55,7 +63,7 @@ local class = {
 
   ["name"] = function (_, a)
     return function (top)
-      return top:name() == a
+      return name(top) == a
     end
   end;
 
@@ -67,13 +75,13 @@ local class = {
 
   ["attr"] = function (_, a)
     return function (top)
-      return top:attr(a) ~= nil
+      return attr(top, a) ~= nil
     end
   end;
 
   ["="] = function (_, a, b)
     return function (top)
-      return top:attr(a) == b
+      return attr(top, a) == b
     end
   end;
 
@@ -82,7 +90,7 @@ local class = {
       return function () end
     else
       return function (top)
-        local u = top:attr(a)
+        local u = attr(top, a)
         if u ~= nil then
           for v in split(u, "[ \t\r\n\f]+"):each() do
             if v == b then
@@ -97,7 +105,7 @@ local class = {
   ["|="] = function (_, a, b)
     local c = "^" .. b:gsub("[^%a]", "%%%1") .. "%-?"
     return function (top)
-      local u = top:attr(a)
+      local u = attr(top, a)
       return u ~= nil and u:find(c)
     end
   end;
@@ -108,7 +116,7 @@ local class = {
     else
       local c = "^" .. b:gsub("[^%a]", "%%%1")
       return function (top)
-        local u = top:attr(a)
+        local u = attr(top, a)
         return u ~= nil and u:find(c)
       end
     end
@@ -120,7 +128,7 @@ local class = {
     else
       local c = b:gsub("[^%a]", "%%%1") .. "$"
       return function (top)
-        local u = top:attr(a)
+        local u = attr(top, a)
         return u ~= nil and u:find(c)
       end
     end
@@ -131,7 +139,7 @@ local class = {
       return function () end
     else
       return function (top)
-        local u = top:attr(a)
+        local u = attr(top, a)
         return u ~= nil and u:find(b, 1, true)
       end
     end
