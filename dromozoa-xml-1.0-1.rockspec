@@ -17,11 +17,11 @@ build = {
   type = "builtin";
   modules = {
     ["dromozoa.xml"] = "dromozoa/xml.lua";
-    ["dromozoa.xml.element"] = "dromozoa/xml/element.lua";
-    ["dromozoa.xml.escape"] = "dromozoa/xml/escape.lua";
-    ["dromozoa.xml.node_list"] = "dromozoa/xml/node_list.lua";
     ["dromozoa.xml.parser"] = "dromozoa/xml/parser.lua";
-    ["dromozoa.xml.selectors"] = "dromozoa/xml/selectors.lua";
-    ["dromozoa.xml.write"] = "dromozoa/xml/write.lua";
+    ["dromozoa.xml.element"] = "dromozoa/xml/element.lua";
+    ["dromozoa.xml.selection"] = "dromozoa/xml/selection.lua";
+    ["dromozoa.xml.selector"] = "dromozoa/xml/selector.lua";
+    ["dromozoa.xml.selector_generator"] = "dromozoa/xml/selector_generator.lua";
+    ["dromozoa.xml.selector_parser"] = "dromozoa/xml/selector_parser.lua";
   };
 }

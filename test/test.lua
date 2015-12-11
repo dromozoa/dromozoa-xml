@@ -18,6 +18,7 @@
 local dumper = require "dromozoa.commons.dumper"
 local equal = require "dromozoa.commons.equal"
 local json = require "dromozoa.commons.json"
+local shell = require "dromozoa.commons.shell"
 local xml = require "dromozoa.xml"
 
 local a, b = xml.escape("<>&\"'")
@@ -54,8 +55,8 @@ assert(equal(xml.decode(X:gsub("\n", "\r")), json.decode(J)))
 -- print(xml.encode(json.decode(J)))
 -- print(xml.decode(xml.encode(json.decode(J))))
 assert(equal(xml.decode(X), xml.decode(xml.encode(json.decode(J)))))
--- print(xml.encode("\0\1\2\3\4\5\6\7\8\9\10\11\12\13\14\15\16"))
-assert(xml.encode("\0\1\2\3\4\5\6\7\8\9\10\11\12\13\14\15\16") == "&#x0;&#x1;&#x2;&#x3;&#x4;&#x5;&#x6;&#x7;&#x8;\t\n&#xb;&#xc;\r&#xe;&#xf;&#x10;")
+-- print(xml.escape("\0\1\2\3\4\5\6\7\8\9\10\11\12\13\14\15\16"))
+assert(xml.escape("\0\1\2\3\4\5\6\7\8\9\10\11\12\13\14\15\16") == "&#x0;&#x1;&#x2;&#x3;&#x4;&#x5;&#x6;&#x7;&#x8;\t\n&#xb;&#xc;\r&#xe;&#xf;&#x10;")
 
 assert(equal(xml.decode([[
 <location><city>New York</city><country>US</country></location>
@@ -206,3 +207,34 @@ assert(doc:query("[foo][bar][baz]"):text() == "qux")
 assert(doc:query_all("p"):text() == "foobarbazqux")
 assert(doc:query_all("p.a"):text() == "barbaz")
 assert(doc:query_all("html > *"):query_all("* > title, * > p"):query(".b"):text() == "baz")
+
+local source =
+{ "foo", { a = "foo\"bar", b = 42, c = true }, {
+  { "bar", { a = "<baz'qux>", b = 69, c = false }, {
+    { "baz", { class = { 42, "xxx", "yyy", "zzz" } }, { "あいうえお" } },
+    { "qux", { b = 666 }, { "かきくけこ" } },
+  }}
+}}
+
+local result = assert(shell.eval("xmllint --encode UTF-8 -", xml.encode(source)))
+-- print(result)
+assert(equal(xml.decode(xml.encode(source)), xml.decode(result)))
+
+local n = xml.element.name
+local a = xml.element.attr
+local t = xml.element.text
+local q = xml.element.query
+
+assert(n(q(source, "[b='69']")) == "bar")
+assert(n(q(source, "[a='<baz\\'qux>']")) == "bar")
+assert(t(q(source, "baz")) == "あいうえお")
+assert(n(q(source, ".xxx")))
+assert(n(q(source, ".\\34\\32")))
+assert(not q(source, ".xyz"))
+
+xml.selector(".a0")
+xml.selector("#0")
+xml.selector("#00")
+xml.selector("#-")
+xml.selector("#--")
+xml.selector(".\\34\\32")
