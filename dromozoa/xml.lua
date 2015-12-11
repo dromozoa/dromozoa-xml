@@ -16,8 +16,8 @@
 -- along with dromozoa-xml.  If not, see <http://www.gnu.org/licenses/>.
 
 local sequence_writer = require "dromozoa.commons.sequence_writer"
+local xml = require "dromozoa.commons.xml"
 local element = require "dromozoa.xml.element"
-local escape = require "dromozoa.xml.escape"
 local node_list = require "dromozoa.xml.node_list"
 local parser = require "dromozoa.xml.parser"
 local selectors = require "dromozoa.xml.selectors"
@@ -28,7 +28,6 @@ local function parse(this)
 end
 
 local class = {
-  escape = escape;
   write = write;
   parse = parse;
   selectors = selectors;
@@ -55,4 +54,6 @@ end
 element.super = class
 node_list.super = class
 
-return class
+return setmetatable(class, {
+  __index = xml;
+})
