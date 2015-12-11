@@ -17,7 +17,7 @@
 
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
-local xml_selector = require "dromozoa.xml.selector"
+local xml_selector = require "dromozoa.xml.selectors"
 local xml_write = require "dromozoa.xml.write"
 
 local class = {}

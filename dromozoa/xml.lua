@@ -18,7 +18,7 @@
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 local escape = require "dromozoa.xml.escape"
 local parser = require "dromozoa.xml.parser"
-local selector = require "dromozoa.xml.selector"
+local selectors = require "dromozoa.xml.selectors"
 local write = require "dromozoa.xml.write"
 
 local function parse(this)
@@ -44,7 +44,7 @@ function class.decode(s)
 end
 
 function class.selector(s)
-  return selector.compile(s)
+  return selectors.compile(s)
 end
 
 return class
