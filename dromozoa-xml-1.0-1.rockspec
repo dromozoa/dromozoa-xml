@@ -22,6 +22,8 @@ build = {
     ["dromozoa.xml.microxml_parser"] = "dromozoa/xml/microxml_parser.lua";
     ["dromozoa.xml.node_list"] = "dromozoa/xml/node_list.lua";
     ["dromozoa.xml.selectors"] = "dromozoa/xml/selectors.lua";
+    ["dromozoa.xml.selectors_generator"] = "dromozoa/xml/selectors_generator.lua";
+    ["dromozoa.xml.selectors_parser"] = "dromozoa/xml/selectors_parser.lua";
     ["dromozoa.xml.write"] = "dromozoa/xml/write.lua";
   };
 }

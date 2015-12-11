@@ -21,6 +21,8 @@ local element = require "dromozoa.xml.element"
 local microxml_parser = require "dromozoa.xml.microxml_parser"
 local node_list = require "dromozoa.xml.node_list"
 local selectors = require "dromozoa.xml.selectors"
+local selectors_generator = require "dromozoa.xml.selectors_generator"
+local selectors_parser = require "dromozoa.xml.selectors_parser"
 local write = require "dromozoa.xml.write"
 
 local function parse(this)
@@ -48,7 +50,11 @@ function class.decode(s)
 end
 
 function class.selector(s)
-  return selectors.compile(s)
+  local v, matcher = selectors_parser(s, selectors_generator()):apply()
+  if not matcher:eof() then
+    error("cannot reach eof at position " .. matcher.position)
+  end
+  return v
 end
 
 element.super = class
