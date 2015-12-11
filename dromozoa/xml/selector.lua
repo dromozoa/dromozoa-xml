@@ -20,18 +20,18 @@ local sequence_writer = require "dromozoa.commons.sequence_writer"
 local split = require "dromozoa.commons.split"
 local string_matcher = require "dromozoa.commons.string_matcher"
 local utf8 = require "dromozoa.commons.utf8"
-local selectors_generator = require "dromozoa.xml.selectors_generator"
-local selectors_parser = require "dromozoa.xml.selectors_parser"
+local selector_generator = require "dromozoa.xml.selector_generator"
+local selector_parser = require "dromozoa.xml.selector_parser"
 
-local function query(selector, stack)
+local function query(fn, stack)
   local top = stack:top()
-  if selector(top, stack, #stack) then
+  if fn(top, stack, #stack) then
     return top
   end
   for node in top:each() do
     if type(node) == "table" then
       stack:push(node)
-      local result = query(selector, stack)
+      local result = query(fn, stack)
       stack:pop()
       if result ~= nil then
         return result
@@ -40,40 +40,56 @@ local function query(selector, stack)
   end
 end
 
-local function query_all(selector, stack, result)
+local function query_all(fn, stack, result)
   local top = stack:top()
-  if selector(top, stack, #stack) then
+  if fn(top, stack, #stack) then
     result:push(top)
   end
   for node in top:each() do
     if type(node) == "table" then
       stack:push(node)
-      query_all(selector, stack, result)
+      query_all(fn, stack, result)
       stack:pop()
     end
   end
   return result
 end
 
-local class = {
-  query = query;
-  query_all = query_all;
-}
+local class = {}
 
-function class.compile(s)
-  local selector, matcher = selectors_parser(s, selectors_generator()):apply()
+function class.new(s)
+  local fn, matcher = selector_parser(s, selector_generator()):apply()
   if not matcher:eof() then
     error("cannot reach eof at position " .. matcher.position)
   end
-  return selector
+  return {
+    fn = fn;
+  }
+end
+
+function class:test(stack)
+  local n = #stack
+  return self.fn(stack[n], stack, n)
+end
+
+function class:query(stack)
+  return query(self.fn, stack)
+end
+
+function class:query_all(stack, result)
+  return query_all(self.fn, stack, result)
 end
 
 local metatable = {
   __index = class;
 }
 
+function metatable:__call(...)
+  return self.fn(...)
+end
+
 return setmetatable(class, {
-  __call = function (_, this)
-    return setmetatable(class.new(this), metatable)
+  __call = function (_, s)
+    return setmetatable(class.new(s), metatable)
   end;
 })

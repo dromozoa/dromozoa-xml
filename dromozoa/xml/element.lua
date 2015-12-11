@@ -50,7 +50,7 @@ function class:query(selector)
   if type(selector) == "string" then
     selector = class.super.selector(selector)
   end
-  return class.super.selectors.query(selector, sequence():push(self)), selector
+  return selector:query(sequence():push(self)), selector
 end
 
 function class:query_all(selector, result)
@@ -60,7 +60,7 @@ function class:query_all(selector, result)
   if result == nil then
     result = class.super.node_list()
   end
-  return class.super.selectors.query_all(selector, sequence():push(self), result), selector
+  return selector:query_all(sequence():push(self), result), selector
 end
 
 local metatable = {
