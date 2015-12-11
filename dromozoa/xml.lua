@@ -16,7 +16,9 @@
 -- along with dromozoa-xml.  If not, see <http://www.gnu.org/licenses/>.
 
 local sequence_writer = require "dromozoa.commons.sequence_writer"
+local element = require "dromozoa.xml.element"
 local escape = require "dromozoa.xml.escape"
+local node_list = require "dromozoa.xml.node_list"
 local parser = require "dromozoa.xml.parser"
 local selectors = require "dromozoa.xml.selectors"
 local write = require "dromozoa.xml.write"
@@ -29,6 +31,9 @@ local class = {
   escape = escape;
   write = write;
   parse = parse;
+  selectors = selectors;
+  element = element;
+  node_list = node_list;
 }
 
 function class.encode(v)
@@ -46,5 +51,8 @@ end
 function class.selector(s)
   return selectors.compile(s)
 end
+
+element.super = class
+node_list.super = class
 
 return class
