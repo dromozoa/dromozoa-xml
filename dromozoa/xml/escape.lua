@@ -15,27 +15,20 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-xml.  If not, see <http://www.gnu.org/licenses/>.
 
-local set = require "dromozoa.commons.set"
+local char_refs = {
+  [string.char(0x26)] = "&amp;";
+  [string.char(0x3c)] = "&lt;";
+  [string.char(0x3e)] = "&gt;";
+  [string.char(0x22)] = "&quot;";
+  [string.char(0x27)] = "&apos;";
+}
 
-local function get_named_char_refs()
-  return {
-    [string.char(0x26)] = "&amp;";
-    [string.char(0x3c)] = "&lt;";
-    [string.char(0x3e)] = "&gt;";
-    [string.char(0x22)] = "&quot;";
-    [string.char(0x27)] = "&apos;";
-  }
-end
-
-local function get_numeric_char_refs(i, j)
-  local refs = {}
-  for i = i, j do
-    refs[string.char(i)] = string.format("&#x%x;", i)
+for byte = 0, 127 do
+  local char = string.char(byte)
+  if char_refs[char] == nil then
+    char_refs[char] = ("&#x%x;"):format(byte)
   end
-  return refs
 end
-
-local char_refs = set.set_union(get_named_char_refs(), get_numeric_char_refs(0, 127))
 
 return function (value, pattern)
   if pattern == nil then
