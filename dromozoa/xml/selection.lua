@@ -21,6 +21,17 @@ local element = require "dromozoa.xml.element"
 
 local class = {}
 
+function class:write(out)
+  for node in sequence.each(self) do
+    element.write_text(node, out)
+  end
+  return out
+end
+
+function class:encode()
+  return class.write(self, sequence_writer()):concat()
+end
+
 function class:write_text(out)
   for node in sequence.each(self) do
     element.write_text(node, out)
@@ -52,15 +63,8 @@ end
 
 local metatable = {
   __index = class;
+  __tostring = class.encode;
 }
-
-function metatable:__tostring()
-  local out = sequence_writer()
-  for node in sequence.each(self) do
-    element.write(node, out)
-  end
-  return out:concat()
-end
 
 return setmetatable(class, {
   __index = sequence;
