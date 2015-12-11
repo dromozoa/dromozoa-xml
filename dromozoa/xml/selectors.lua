@@ -20,6 +20,8 @@ local sequence_writer = require "dromozoa.commons.sequence_writer"
 local split = require "dromozoa.commons.split"
 local string_matcher = require "dromozoa.commons.string_matcher"
 local utf8 = require "dromozoa.commons.utf8"
+local selectors_generator = require "dromozoa.xml.selectors_generator"
+local selectors_parser = require "dromozoa.xml.selectors_parser"
 
 local function query(selector, stack)
   local top = stack:top()
@@ -59,7 +61,7 @@ local class = {
 }
 
 function class.compile(s)
-  local selector, matcher = class(s):apply()
+  local selector, matcher = selectors_parser(s, selectors_generator()):apply()
   if not matcher:eof() then
     error("cannot reach eof at position " .. matcher.position)
   end
