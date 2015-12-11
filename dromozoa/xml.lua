@@ -18,12 +18,12 @@
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 local xml = require "dromozoa.commons.xml"
 local element = require "dromozoa.xml.element"
-local microxml_parser = require "dromozoa.xml.microxml_parser"
+local parser = require "dromozoa.xml.parser"
 local selection = require "dromozoa.xml.selection"
 local selector = require "dromozoa.xml.selector"
 
 local function parse(this)
-  return microxml_parser(this):apply()
+  return parser(this):apply()
 end
 
 local class = {
