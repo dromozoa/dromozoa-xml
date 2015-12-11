@@ -17,42 +17,41 @@
 
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
+local write = require "dromozoa.xml.write"
 
 local class = {}
 
-function class:text()
-  local out = sequence_writer()
+function class:write_text(out)
   for node in self:each() do
-    out:write(node:text())
+    node:write_text(out)
   end
-  return out:concat()
+  return out
 end
 
-function class:query(selector)
-  if type(selector) == "string" then
-    selector = class.super.selector(selector)
-  end
+function class:text()
+  return self:write_text(sequence_writer()):concat()
+end
+
+function class:query(s)
+  local result
   for node in self:each() do
     if type(node) == "table" then
-      local result = node:query(selector)
+      result, s = node:query(s)
       if result then
-        return result, selector
+        return result, s
       end
     end
   end
 end
 
-function class:query_all(selector)
-  if type(selector) == "string" then
-    selector = class.super.selector(selector)
-  end
-  local result = class()
+function class:query_all(s)
+  local result
   for node in self:each() do
     if type(node) == "table" then
-      result = node:query_all(selector, result)
+      result, s = node:query_all(s, result)
     end
   end
-  return result
+  return result, s
 end
 
 local metatable = {
@@ -62,7 +61,7 @@ local metatable = {
 function metatable:__tostring()
   local out = sequence_writer()
   for node in self:each() do
-    class.super.write(out, node)
+    write(out, node)
   end
   return out:concat()
 end
