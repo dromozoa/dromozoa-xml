@@ -15,10 +15,12 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-xml.  If not, see <http://www.gnu.org/licenses/>.
 
+local empty = require "dromozoa.commons.empty"
 local ipairs = require "dromozoa.commons.ipairs"
+local pairs = require "dromozoa.commons.pairs"
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
-local write = require "dromozoa.xml.write"
+local xml = require "dromozoa.commons.xml"
 
 local class = {}
 
@@ -33,8 +35,11 @@ end
 function class:attr(name)
   local value = self[2][name]
   if value ~= nil then
-    if type(value) == "number" then
+    local t = type(value)
+    if t == "number" then
       return ("%.17g"):format(value)
+    elseif t == "table" then
+      return table.concat(value, " ")
     else
       return tostring(value)
     end
@@ -42,11 +47,41 @@ function class:attr(name)
 end
 
 function class:each()
-  return self[3]:each()
+  return coroutine.wrap(function ()
+    for _, node in ipairs(self[3]) do
+      coroutine.yield(node)
+    end
+  end)
+end
+
+function class:write(out)
+  local name = class.name(self)
+  out:write("<", name)
+  for name in pairs(self[2]) do
+    out:write(" ", name, "=\"", xml.escape(class.attr(self, name)), "\"")
+  end
+  local content = self[3]
+  if empty(content) then
+    out:write("/>")
+  else
+    out:write(">")
+    for node in class.each(self) do
+      local t = type(node)
+      if t == "number" then
+        out:write(xml.escape(("%.17g"):format(node)))
+      elseif t ~= "table" then
+        out:write(xml.escape(tostring(node)))
+      else
+        class.write(node, out)
+      end
+    end
+    out:write("</" .. name .. ">")
+  end
+  return out
 end
 
 function class:write_text(out)
-  for i, node in ipairs(self[3]) do
+  for node in class.each(self) do
     local t = type(node)
     if t == "number" then
       out:write(("%.17g"):format(value))
@@ -58,7 +93,7 @@ function class:write_text(out)
 end
 
 function class:text()
-  return self:write_text(sequence_writer()):concat()
+  return class.write_text(self, sequence_writer()):concat()
 end
 
 function class:query(s)
@@ -83,11 +118,11 @@ local metatable = {
 }
 
 function metatable:__tostring()
-  return write(sequence_writer(), self):concat()
+  return class.write(self, sequence_writer()):concat()
 end
 
 return setmetatable(class, {
-  __call = function (_, name, attribute_list, content)
-    return setmetatable(class.new(name, attribute_list, content), metatable)
+  __call = function (_, name, attrs, content)
+    return setmetatable(class.new(name, attrs, content), metatable)
   end;
 })

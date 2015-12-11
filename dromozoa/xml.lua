@@ -21,7 +21,6 @@ local element = require "dromozoa.xml.element"
 local microxml_parser = require "dromozoa.xml.microxml_parser"
 local node_list = require "dromozoa.xml.node_list"
 local selector = require "dromozoa.xml.selector"
-local write = require "dromozoa.xml.write"
 
 local function parse(this)
   return microxml_parser(this):apply()
@@ -31,12 +30,11 @@ local class = {
   element = element;
   node_list = node_list;
   parse = parse;
-  write = write;
   selector = selector;
 }
 
 function class.encode(v)
-  return write(sequence_writer(), v):concat()
+  return element.write(v, sequence_writer()):concat()
 end
 
 function class.decode(s)

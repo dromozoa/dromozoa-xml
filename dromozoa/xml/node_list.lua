@@ -18,40 +18,34 @@
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
 local element = require "dromozoa.xml.element"
-local write = require "dromozoa.xml.write"
 
 local class = {}
 
 function class:write_text(out)
-  for node in self:each() do
-    -- maybe text?
+  for node in sequence.each(self) do
     element.write_text(node, out)
   end
   return out
 end
 
 function class:text()
-  return self:write_text(sequence_writer()):concat()
+  return class.write_text(self, sequence_writer()):concat()
 end
 
 function class:query(s)
   local result
-  for node in self:each() do
-    if type(node) == "table" then
-      result, s = element.query(node, s)
-      if result then
-        return result, s
-      end
+  for node in sequence.each(self) do
+    result, s = element.query(node, s)
+    if result then
+      return result, s
     end
   end
 end
 
 function class:query_all(s)
   local result
-  for node in self:each() do
-    if type(node) == "table" then
-      result, s = element.query_all(node, s, result)
-    end
+  for node in sequence.each(self) do
+    result, s = element.query_all(node, s, result)
   end
   return result, s
 end
@@ -62,8 +56,8 @@ local metatable = {
 
 function metatable:__tostring()
   local out = sequence_writer()
-  for node in self:each() do
-    write(out, node)
+  for node in sequence.each(self) do
+    element.write(node, out)
   end
   return out:concat()
 end
