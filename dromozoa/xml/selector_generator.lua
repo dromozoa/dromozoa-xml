@@ -22,7 +22,14 @@ local function name(element)
 end
 
 local function attr(element, name)
-  return element[2][name]
+  local u = element[2][name]
+  if u ~= nil then
+    if type(u) == "number" then
+      return ("%.17g"):format(u)
+    else
+      return tostring(u)
+    end
+  end
 end
 
 local class = {

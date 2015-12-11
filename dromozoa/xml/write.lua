@@ -24,14 +24,6 @@ local function write(out, v)
   local t = type(v)
   if t == "number" then
     out:write(xml.escape(string.format("%.17g", v)))
-  elseif t == "string" then
-    out:write(xml.escape(v))
-  elseif t == "boolean" then
-    if v then
-      out:write("true")
-    else
-      out:write("false")
-    end
   elseif t == "table" then
     local name = v[1]
     local attrs = v[2]
@@ -49,6 +41,8 @@ local function write(out, v)
       end
       out:write("</", name, ">")
     end
+  else
+    out:write(xml.escape(tostring(v)))
   end
   return out
 end

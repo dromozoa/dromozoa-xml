@@ -40,8 +40,12 @@ end
 
 function class:write_text(out)
   for i, node in ipairs(self[3]) do
-    if type(node) ~= "table" then
-      out:write(node)
+    local t = type(node)
+    if t ~= "table" then
+      if t == "number" then
+      else
+        out:write(node)
+      end
     end
   end
   return out
