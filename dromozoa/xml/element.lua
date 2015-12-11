@@ -17,9 +17,9 @@
 
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
-local xml_node_list = require "dromozoa.xml.node_list"
-local xml_write = require "dromozoa.xml.write"
-local xml_selector = require "dromozoa.xml.selectors"
+local node_list = require "dromozoa.xml.node_list"
+local write = require "dromozoa.xml.write"
+local selectors = require "dromozoa.xml.selectors"
 
 local class = {}
 
@@ -51,19 +51,19 @@ end
 
 function class:query(selector)
   if type(selector) == "string" then
-    selector = xml_selector.compile(selector)
+    selector = selectors.compile(selector)
   end
-  return xml_selector.query(selector, sequence():push(self)), selector
+  return selectors.query(selector, sequence():push(self)), selector
 end
 
 function class:query_all(selector, result)
   if type(selector) == "string" then
-    selector = xml_selector.compile(selector)
+    selector = selectors.compile(selector)
   end
   if result == nil then
-    result = xml_node_list()
+    result = node_list()
   end
-  return xml_selector.query_all(selector, sequence():push(self), result), selector
+  return selectors.query_all(selector, sequence():push(self), result), selector
 end
 
 local metatable = {
@@ -71,7 +71,7 @@ local metatable = {
 }
 
 function metatable:__tostring()
-  return xml_write(sequence_writer(), self):concat()
+  return write(sequence_writer(), self):concat()
 end
 
 return setmetatable(class, {
