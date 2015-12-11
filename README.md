@@ -1,3 +1,3 @@
 # dromozoa-xml
 
-MicroXML parser and toolkit.
+XML parser and toolkit.

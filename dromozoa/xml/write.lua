@@ -18,14 +18,14 @@
 local empty = require "dromozoa.commons.empty"
 local ipairs = require "dromozoa.commons.ipairs"
 local pairs = require "dromozoa.commons.pairs"
-local xml_escape = require "dromozoa.xml.escape"
+local escape = require "dromozoa.xml.escape"
 
 local function write(out, v)
   local t = type(v)
   if t == "number" then
-    out:write(string.format("%.17g", v))
+    out:write(escape(string.format("%.17g", v)))
   elseif t == "string" then
-    out:write(xml_escape(v))
+    out:write(escape(v))
   elseif t == "boolean" then
     if v then
       out:write("true")
@@ -38,7 +38,7 @@ local function write(out, v)
     local content = v[3]
     out:write("<", name)
     for name, value in pairs(attrs) do
-      out:write(" ", name, "=\"", xml_escape(value), "\"")
+      out:write(" ", name, "=\"", escape(value), "\"")
     end
     if empty(content) then
       out:write("/>")
