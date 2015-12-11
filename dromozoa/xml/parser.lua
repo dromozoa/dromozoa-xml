@@ -17,26 +17,25 @@
 
 local empty = require "dromozoa.commons.empty"
 local linked_hash_table = require "dromozoa.commons.linked_hash_table"
-local string_matcher = require "dromozoa.commons.string_matcher"
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
+local string_matcher = require "dromozoa.commons.string_matcher"
 local utf8 = require "dromozoa.commons.utf8"
 local element = require "dromozoa.xml.element"
-local node_list = require "dromozoa.xml.node_list"
 
 local ws = "[ \t\r\n]*"
 local zero_width_no_break_space = string.char(0xef, 0xbb, 0xbf)
 
 local class = {}
 
-function class.new(this)
+function class.new(this, strict)
   if type(this) == "string" then
     this = string_matcher(this)
   end
   return {
     this = this;
+    strict = strict;
     stack = sequence();
-    strict = false;
   }
 end
 
@@ -70,7 +69,7 @@ function class:element()
       stack:push(element(name, attributes))
       return self:content()
     elseif this:match(ws .. "/>") then
-      return stack:push(element(name, attributes, node_list()))
+      return stack:push(element(name, attributes, sequence()))
     else
       self:raise("unclosed tag")
     end
@@ -80,7 +79,7 @@ end
 function class:content()
   local this = self.this
   local stack = self.stack
-  local that = node_list()
+  local that = sequence()
   while true do
     if this:match("</([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255]*)") then
       local name = this[1]
@@ -206,9 +205,9 @@ function class:prolog()
   local this = self.this
   this:match(zero_width_no_break_space)
   if not self.strict then
-    this:match(ws .. "%<%?xml .-%?%>")
+    this:match(ws .. "%<%?xml[ \t\r\n].-%?%>")
     self:misc()
-    this:match("%<%!DOCTYPE .-%>")
+    this:match("%<%!DOCTYPE[ \t\r\n].-%>")
   end
   self:misc()
 end
@@ -236,7 +235,7 @@ local metatable = {
 }
 
 return setmetatable(class, {
-  __call = function (_, this)
-    return setmetatable(class.new(this), metatable)
+  __call = function (_, this, strict)
+    return setmetatable(class.new(this, strict), metatable)
   end;
 })

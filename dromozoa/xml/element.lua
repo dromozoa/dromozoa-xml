@@ -15,64 +15,106 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-xml.  If not, see <http://www.gnu.org/licenses/>.
 
+local empty = require "dromozoa.commons.empty"
+local ipairs = require "dromozoa.commons.ipairs"
+local pairs = require "dromozoa.commons.pairs"
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
+local xml = require "dromozoa.commons.xml"
 
 local class = {}
 
-function class.new(name, attribute_list, content)
-  return { name, attribute_list, content }
+function class.new(name, attrs, content)
+  return { name, attrs, content }
 end
 
 function class:name()
   return self[1]
 end
 
-function class:attr(name, value)
-  return self[2][name]
+function class:attr(name)
+  local value = self[2][name]
+  if value ~= nil then
+    if type(value) == "table" then
+      return table.concat(value, " ")
+    else
+      return tostring(value)
+    end
+  end
 end
 
 function class:each()
-  return self[3]:each()
+  return coroutine.wrap(function ()
+    for _, node in ipairs(self[3]) do
+      coroutine.yield(node)
+    end
+  end)
+end
+
+function class:write(out)
+  local name = class.name(self)
+  out:write("<", name)
+  for name in pairs(self[2]) do
+    out:write(" ", name, "=\"", xml.escape(class.attr(self, name)), "\"")
+  end
+  local content = self[3]
+  if empty(content) then
+    out:write("/>")
+  else
+    out:write(">")
+    for node in class.each(self) do
+      if type(node) == "table" then
+        class.write(node, out)
+      else
+        out:write(xml.escape(tostring(node)))
+      end
+    end
+    out:write("</" .. name .. ">")
+  end
+  return out
+end
+
+function class:encode()
+  return class.write(self, sequence_writer()):concat()
+end
+
+function class:write_text(out)
+  for node in class.each(self) do
+    if type(node) ~= "table" then
+      out:write(tostring(node))
+    end
+  end
+  return out
 end
 
 function class:text()
-  local out = sequence_writer()
-  for node in self:each() do
-    if type(node) ~= "table" then
-      out:write(node)
-    end
-  end
-  return out:concat()
+  return class.write_text(self, sequence_writer()):concat()
 end
 
-function class:query(selector)
-  if type(selector) == "string" then
-    selector = class.super.selector(selector)
+function class:query(s)
+  if type(s) == "string" then
+    s = class.super.selector(s)
   end
-  return class.super.selectors.query(selector, sequence():push(self)), selector
+  return s:query(sequence():push(self)), s
 end
 
-function class:query_all(selector, result)
-  if type(selector) == "string" then
-    selector = class.super.selector(selector)
+function class:query_all(s, result)
+  if type(s) == "string" then
+    s = class.super.selector(s)
   end
   if result == nil then
-    result = class.super.node_list()
+    result = class.super.selection()
   end
-  return class.super.selectors.query_all(selector, sequence():push(self), result), selector
+  return s:query_all(sequence():push(self), result), s
 end
 
 local metatable = {
   __index = class;
+  __tostring = class.encode;
 }
 
-function metatable:__tostring()
-  return class.super.write(sequence_writer(), self):concat()
-end
-
 return setmetatable(class, {
-  __call = function (_, name, attribute_list, content)
-    return setmetatable(class.new(name, attribute_list, content), metatable)
+  __call = function (_, name, attrs, content)
+    return setmetatable(class.new(name, attrs, content), metatable)
   end;
 })

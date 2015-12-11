@@ -17,55 +17,54 @@
 
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
+local element = require "dromozoa.xml.element"
 
 local class = {}
 
+function class:write(out)
+  for node in sequence.each(self) do
+    element.write_text(node, out)
+  end
+  return out
+end
+
+function class:encode()
+  return class.write(self, sequence_writer()):concat()
+end
+
+function class:write_text(out)
+  for node in sequence.each(self) do
+    element.write_text(node, out)
+  end
+  return out
+end
+
 function class:text()
-  local out = sequence_writer()
-  for node in self:each() do
-    out:write(node:text())
-  end
-  return out:concat()
+  return class.write_text(self, sequence_writer()):concat()
 end
 
-function class:query(selector)
-  if type(selector) == "string" then
-    selector = class.super.selector(selector)
-  end
-  for node in self:each() do
-    if type(node) == "table" then
-      local result = node:query(selector)
-      if result then
-        return result, selector
-      end
+function class:query(s)
+  local result
+  for node in sequence.each(self) do
+    result, s = element.query(node, s)
+    if result then
+      return result, s
     end
   end
 end
 
-function class:query_all(selector)
-  if type(selector) == "string" then
-    selector = class.super.selector(selector)
+function class:query_all(s)
+  local result
+  for node in sequence.each(self) do
+    result, s = element.query_all(node, s, result)
   end
-  local result = class()
-  for node in self:each() do
-    if type(node) == "table" then
-      result = node:query_all(selector, result)
-    end
-  end
-  return result
+  return result, s
 end
 
 local metatable = {
   __index = class;
+  __tostring = class.encode;
 }
-
-function metatable:__tostring()
-  local out = sequence_writer()
-  for node in self:each() do
-    class.super.write(out, node)
-  end
-  return out:concat()
-end
 
 return setmetatable(class, {
   __index = sequence;

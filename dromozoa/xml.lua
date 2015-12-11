@@ -15,29 +15,25 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-xml.  If not, see <http://www.gnu.org/licenses/>.
 
-local sequence_writer = require "dromozoa.commons.sequence_writer"
+local xml = require "dromozoa.commons.xml"
 local element = require "dromozoa.xml.element"
-local escape = require "dromozoa.xml.escape"
-local node_list = require "dromozoa.xml.node_list"
 local parser = require "dromozoa.xml.parser"
-local selectors = require "dromozoa.xml.selectors"
-local write = require "dromozoa.xml.write"
+local selection = require "dromozoa.xml.selection"
+local selector = require "dromozoa.xml.selector"
 
 local function parse(this)
   return parser(this):apply()
 end
 
 local class = {
-  escape = escape;
-  write = write;
-  parse = parse;
-  selectors = selectors;
   element = element;
-  node_list = node_list;
+  parse = parse;
+  selector = selector;
+  selection = selection;
 }
 
 function class.encode(v)
-  return write(sequence_writer(), v):concat()
+  return element.encode(v)
 end
 
 function class.decode(s)
@@ -48,11 +44,8 @@ function class.decode(s)
   return v
 end
 
-function class.selector(s)
-  return selectors.compile(s)
-end
-
 element.super = class
-node_list.super = class
 
-return class
+return setmetatable(class, {
+  __index = xml;
+})
