@@ -19,7 +19,7 @@ local sequence_writer = require "dromozoa.commons.sequence_writer"
 local xml = require "dromozoa.commons.xml"
 local element = require "dromozoa.xml.element"
 local microxml_parser = require "dromozoa.xml.microxml_parser"
-local node_list = require "dromozoa.xml.node_list"
+local selection = require "dromozoa.xml.selection"
 local selector = require "dromozoa.xml.selector"
 
 local function parse(this)
@@ -28,9 +28,9 @@ end
 
 local class = {
   element = element;
-  node_list = node_list;
   parse = parse;
   selector = selector;
+  selection = selection;
 }
 
 function class.encode(v)

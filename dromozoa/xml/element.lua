@@ -108,7 +108,7 @@ function class:query_all(s, result)
     s = class.super.selector(s)
   end
   if result == nil then
-    result = class.super.node_list()
+    result = class.super.selection()
   end
   return s:query_all(sequence():push(self), result), s
 end

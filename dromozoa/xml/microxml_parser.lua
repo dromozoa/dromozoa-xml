@@ -22,7 +22,6 @@ local sequence_writer = require "dromozoa.commons.sequence_writer"
 local string_matcher = require "dromozoa.commons.string_matcher"
 local utf8 = require "dromozoa.commons.utf8"
 local element = require "dromozoa.xml.element"
-local node_list = require "dromozoa.xml.node_list"
 
 local ws = "[ \t\r\n]*"
 local zero_width_no_break_space = string.char(0xef, 0xbb, 0xbf)
@@ -70,7 +69,7 @@ function class:element()
       stack:push(element(name, attributes))
       return self:content()
     elseif this:match(ws .. "/>") then
-      return stack:push(element(name, attributes, node_list()))
+      return stack:push(element(name, attributes, sequence()))
     else
       self:raise("unclosed tag")
     end
@@ -80,7 +79,7 @@ end
 function class:content()
   local this = self.this
   local stack = self.stack
-  local that = node_list()
+  local that = sequence()
   while true do
     if this:match("</([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255]*)") then
       local name = this[1]

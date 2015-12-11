@@ -209,10 +209,10 @@ assert(doc:query_all("p.a"):text() == "barbaz")
 assert(doc:query_all("html > *"):query_all("* > title, * > p"):query(".b"):text() == "baz")
 
 local source =
-{ "foo", { a1 = "foo\"bar", a2 = 42, a3 = true }, {
-  { "bar", { a1 = "<baz'qux>", a2 = 69, a3 = false }, {
-    { "baz", {}, { "あいうえお" } },
-    { "qux", { a2 = 666 }, { "かきくけこ" } },
+{ "foo", { a = "foo\"bar", b = 42, c = true }, {
+  { "bar", { a = "<baz'qux>", b = 69, c = false }, {
+    { "baz", { class = { 42, "xxx", "yyy", "zzz" } }, { "あいうえお" } },
+    { "qux", { b = 666 }, { "かきくけこ" } },
   }}
 }}
 
@@ -220,7 +220,21 @@ local result = assert(shell.eval("xmllint --encode UTF-8 -", xml.encode(source))
 -- print(result)
 assert(equal(xml.decode(xml.encode(source)), xml.decode(result)))
 
-local nodes = xml.node_list():push(source)
-assert(nodes:query("baz")[3][1] == "あいうえお")
+local n = xml.element.name
+local a = xml.element.attr
+local t = xml.element.text
+local q = xml.element.query
 
+assert(n(q(source, "[b='69']")) == "bar")
+assert(n(q(source, "[a='<baz\\'qux>']")) == "bar")
+assert(t(q(source, "baz")) == "あいうえお")
+assert(n(q(source, ".xxx")))
+assert(n(q(source, ".\\34\\32")))
+assert(not q(source, ".xyz"))
 
+xml.selector(".a0")
+xml.selector("#0")
+xml.selector("#00")
+xml.selector("#-")
+xml.selector("#--")
+xml.selector(".\\34\\32")

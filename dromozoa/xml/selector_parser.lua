@@ -185,10 +185,10 @@ end
 function class:name_impl(start)
   local this = self.this
   local stack = self.stack
-  if this:lookahead(start) or this:lookahead("\\[^\n\r\f]") then
+  if this:lookahead(start) or this:lookahead("%\\[^\n\r\f]") then
     local out = sequence_writer()
     while true do
-      if this:match("([%_A-Za-z%-\128-\255]+)") then
+      if this:match("([%_A-Za-z0-9%-\128-\255]+)") then
         out:write(this[1])
       elseif this:match("%\\(%x%x?%x?%x?%x?%x?)") then
         out:write(utf8.char(tonumber(this[1], 16)))
@@ -209,7 +209,7 @@ function class:ident()
 end
 
 function class:name()
-  return self:name_impl("[%_A-Za-z%-\128-\255]")
+  return self:name_impl("[%_A-Za-z0-9%-\128-\255]")
 end
 
 function class:string()
