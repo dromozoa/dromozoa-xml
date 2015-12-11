@@ -17,9 +17,9 @@
 
 local empty = require "dromozoa.commons.empty"
 local linked_hash_table = require "dromozoa.commons.linked_hash_table"
-local string_matcher = require "dromozoa.commons.string_matcher"
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
+local string_matcher = require "dromozoa.commons.string_matcher"
 local utf8 = require "dromozoa.commons.utf8"
 local element = require "dromozoa.xml.element"
 local node_list = require "dromozoa.xml.node_list"
