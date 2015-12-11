@@ -29,14 +29,14 @@ local zero_width_no_break_space = string.char(0xef, 0xbb, 0xbf)
 
 local class = {}
 
-function class.new(this)
+function class.new(this, strict)
   if type(this) == "string" then
     this = string_matcher(this)
   end
   return {
     this = this;
+    strict = strict;
     stack = sequence();
-    strict = false;
   }
 end
 
@@ -206,9 +206,9 @@ function class:prolog()
   local this = self.this
   this:match(zero_width_no_break_space)
   if not self.strict then
-    this:match(ws .. "%<%?xml .-%?%>")
+    this:match(ws .. "%<%?xml[ \t\r\n].-%?%>")
     self:misc()
-    this:match("%<%!DOCTYPE .-%>")
+    this:match("%<%!DOCTYPE[ \t\r\n].-%>")
   end
   self:misc()
 end
@@ -236,7 +236,7 @@ local metatable = {
 }
 
 return setmetatable(class, {
-  __call = function (_, this)
-    return setmetatable(class.new(this), metatable)
+  __call = function (_, this, strict)
+    return setmetatable(class.new(this, strict), metatable)
   end;
 })
