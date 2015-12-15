@@ -99,7 +99,7 @@ local class = {
   end;
 
   ["|="] = function (_, a, b)
-    local c = "^" .. b:gsub("[^%a]", "%%%1") .. "%-?"
+    local c = "^" .. b:gsub("%A", "%%%1") .. "%-?"
     return function (top)
       local u = attr(top, a)
       return u ~= nil and u:find(c)
@@ -110,7 +110,7 @@ local class = {
     if b == "" then
       return function () end
     else
-      local c = "^" .. b:gsub("[^%a]", "%%%1")
+      local c = "^" .. b:gsub("%A", "%%%1")
       return function (top)
         local u = attr(top, a)
         return u ~= nil and u:find(c)
@@ -122,7 +122,7 @@ local class = {
     if b == "" then
       return function () end
     else
-      local c = b:gsub("[^%a]", "%%%1") .. "$"
+      local c = b:gsub("%A", "%%%1") .. "$"
       return function (top)
         local u = attr(top, a)
         return u ~= nil and u:find(c)
