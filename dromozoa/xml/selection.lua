@@ -21,8 +21,34 @@ local element = require "dromozoa.xml.element"
 
 local class = {}
 
+function class:count(name)
+  if name == nil then
+    return #self
+  else
+    local count = 0
+    for node in class.each(self, name) do
+      count = count + 1
+    end
+    return count
+  end
+end
+
+function class:each(name)
+  if name == nil then
+    return sequence.each(self)
+  else
+    return coroutine.wrap(function ()
+      for node in sequence.each(self) do
+        if element.name(node) == name then
+          coroutine.yield(node)
+        end
+      end
+    end)
+  end
+end
+
 function class:write(out)
-  for node in sequence.each(self) do
+  for node in class.each(self) do
     element.write_text(node, out)
   end
   return out
@@ -33,7 +59,7 @@ function class:encode()
 end
 
 function class:write_text(out)
-  for node in sequence.each(self) do
+  for node in class.each(self) do
     element.write_text(node, out)
   end
   return out
@@ -45,7 +71,7 @@ end
 
 function class:query(s)
   local result
-  for node in sequence.each(self) do
+  for node in class.each(self) do
     result, s = element.query(node, s)
     if result then
       return result, s
@@ -55,7 +81,7 @@ end
 
 function class:query_all(s)
   local result
-  for node in sequence.each(self) do
+  for node in class.each(self) do
     result, s = element.query_all(node, s, result)
   end
   return result, s
