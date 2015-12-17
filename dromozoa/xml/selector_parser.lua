@@ -60,8 +60,7 @@ function class:selector_group()
     while this:match("," .. ws) do
       if self:selector() then
         local b = stack:pop()
-        local a = stack:pop()
-        self:generate(",", a, b)
+        self:generate(",", stack:pop(), b)
       else
         self:raise()
       end
@@ -87,8 +86,7 @@ function class:selector()
       end
       if self:simple_selector_sequence() then
         local b = stack:pop()
-        local a = stack:pop()
-        self:generate(op, a, b)
+        self:generate(op, stack:pop(), b)
       else
         self:raise()
       end
@@ -101,8 +99,7 @@ function class:simple_selector_sequence()
   if self:type_selector() or self:universal() or self:hash() or self:class() or self:attrib() or self:pseudo() then
     while self:hash() or self:class() or self:attrib() or self:pseudo() do
       local b = stack:pop()
-      local a = stack:pop()
-      self:generate("", a, b)
+      self:generate("", stack:pop(), b)
     end
     return true
   end
@@ -118,8 +115,7 @@ end
 function class:element_name()
   local stack = self.stack
   if self:ident() then
-    local a = stack:pop()
-    return self:generate("name", a)
+    return self:generate("name", stack:pop())
   end
 end
 
@@ -170,11 +166,13 @@ function class:pseudo()
   local this = self.this
   local stack = self.stack
   if this:match(":") then
-    if self:ident() and stack:pop():match("^[Nn][Oo][Tt]$") and this:match("%(" .. ws) then
-      if self:type_selector() or self:universal() or self:hash() or self:class() or self:attrib() then
-        if this:match(ws .. "%)") then
-          local a = stack:pop()
-          return self:generate("not", a)
+    if self:ident() then
+      local a = stack:pop():lower()
+      if a == "only-child" or a == "only-of-type" or a == "empty" then
+        return self:generate(a)
+      elseif a == "not" then
+        if this:match("%(" .. ws) and (self:type_selector() or self:universal() or self:hash() or self:class() or self:attrib()) and this:match(ws .. "%)") then
+          return self:generate(a, stack:pop())
         end
       end
     end
@@ -245,8 +243,7 @@ function class:hash()
   local stack = self.stack
   if this:match("#") then
     if self:name() then
-      local a = stack:pop()
-      return self:generate("=", "id", a)
+      return self:generate("=", "id", stack:pop())
     end
     self:raise()
   end
