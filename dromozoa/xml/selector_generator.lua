@@ -20,6 +20,7 @@ local element = require "dromozoa.xml.element"
 
 local name = element.name
 local attr = element.attr
+local count = element.count
 
 local class = {
   [","] = function (_, a, b)
@@ -99,7 +100,7 @@ local class = {
   end;
 
   ["|="] = function (_, a, b)
-    local c = "^" .. b:gsub("[^%a]", "%%%1") .. "%-?"
+    local c = "^" .. b:gsub("%A", "%%%1") .. "%-?"
     return function (top)
       local u = attr(top, a)
       return u ~= nil and u:find(c)
@@ -110,7 +111,7 @@ local class = {
     if b == "" then
       return function () end
     else
-      local c = "^" .. b:gsub("[^%a]", "%%%1")
+      local c = "^" .. b:gsub("%A", "%%%1")
       return function (top)
         local u = attr(top, a)
         return u ~= nil and u:find(c)
@@ -122,7 +123,7 @@ local class = {
     if b == "" then
       return function () end
     else
-      local c = b:gsub("[^%a]", "%%%1") .. "$"
+      local c = b:gsub("%A", "%%%1") .. "$"
       return function (top)
         local u = attr(top, a)
         return u ~= nil and u:find(c)
@@ -138,6 +139,28 @@ local class = {
         local u = attr(top, a)
         return u ~= nil and u:find(b, 1, true)
       end
+    end
+  end;
+
+  ["only-child"] = function ()
+    return function (top, stack, n)
+      if n > 1 then
+        return count(stack[n - 1]) == 1
+      end
+    end
+  end;
+
+  ["only-of-type"] = function ()
+    return function (top, stack, n)
+      if n > 1 then
+        return count(stack[n - 1], name(top)) == 1
+      end
+    end
+  end;
+
+  ["empty"] = function ()
+    return function (top)
+      return count(top) == 0
     end
   end;
 
