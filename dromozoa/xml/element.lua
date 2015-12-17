@@ -16,7 +16,6 @@
 -- along with dromozoa-xml.  If not, see <http://www.gnu.org/licenses/>.
 
 local empty = require "dromozoa.commons.empty"
-local ipairs = require "dromozoa.commons.ipairs"
 local pairs = require "dromozoa.commons.pairs"
 local sequence = require "dromozoa.commons.sequence"
 local sequence_writer = require "dromozoa.commons.sequence_writer"
@@ -43,12 +42,34 @@ function class:attr(name)
   end
 end
 
-function class:each()
-  return coroutine.wrap(function ()
-    for _, node in ipairs(self[3]) do
-      coroutine.yield(node)
+function class:count(name)
+  if name == nil then
+    return #self[3]
+  else
+    local count = 0
+    for node in class.each(self, name) do
+      count = count + 1
     end
-  end)
+    return count
+  end
+end
+
+function class:each(name)
+  if name == nil then
+    return coroutine.wrap(function ()
+      for node in sequence.each(self[3]) do
+        coroutine.yield(node)
+      end
+    end)
+  else
+    return coroutine.wrap(function ()
+      for node in sequence.each(self[3]) do
+        if type(node) == "table" and class.name(node) == name then
+          coroutine.yield(node)
+        end
+      end
+    end)
+  end
 end
 
 function class:write(out)
@@ -69,7 +90,7 @@ function class:write(out)
         out:write(xml.escape(tostring(node)))
       end
     end
-    out:write("</" .. name .. ">")
+    out:write("</", name, ">")
   end
   return out
 end
