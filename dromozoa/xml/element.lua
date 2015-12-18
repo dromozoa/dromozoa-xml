@@ -83,12 +83,18 @@ function class:write(out)
     out:write("/>")
   else
     out:write(">")
+    local prev_is_element = true
     for node in class.each(self) do
-      if type(node) == "table" then
+      local is_element = type(node) == "table"
+      if is_element then
         class.write(node, out)
       else
+        if not prev_is_element then
+          out:write(" ")
+        end
         out:write(xml.escape(tostring(node)))
       end
+      prev_is_element = is_element
     end
     out:write("</", name, ">")
   end
@@ -100,10 +106,16 @@ function class:encode()
 end
 
 function class:write_text(out)
+  local prev_is_element = true
   for node in class.each(self) do
-    if type(node) ~= "table" then
+    local is_element = type(node) == "table"
+    if not is_element then
+      if not prev_is_element then
+        out:write(" ")
+      end
       out:write(tostring(node))
     end
+    prev_is_element = is_element
   end
   return out
 end
