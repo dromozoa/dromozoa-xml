@@ -97,9 +97,13 @@ function class:content()
       that:push(stack:pop())
     elseif self:comment() then
       -- comment
-    elseif this:lookahead("%<") then
-      self:raise("invalid content")
     else
+      if not self.strict and this:lookahead("%<%!%[CDATA%[") then
+        -- cdata
+      elseif this:lookahead("%<") then
+        self:raise("invalid content")
+      end
+
       local out = sequence_writer()
       while true do
         if this:match("\r\n") or this:match("[\r\n]") then
@@ -110,6 +114,8 @@ function class:content()
           out:write(stack:pop())
         elseif self:comment() then
           -- comment
+        elseif this:match("%<%!%[CDATA%[(.-)%]%]%>") then
+          out:write(this[1])
         elseif this:lookahead("%<") then
           break
         else

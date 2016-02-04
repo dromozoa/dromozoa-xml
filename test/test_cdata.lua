@@ -15,37 +15,19 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-xml.  If not, see <http://www.gnu.org/licenses/>.
 
-local xml = require "dromozoa.commons.xml"
-local element = require "dromozoa.xml.element"
-local parser = require "dromozoa.xml.parser"
-local selection = require "dromozoa.xml.selection"
-local selector = require "dromozoa.xml.selector"
+local xml = require "dromozoa.xml"
 
-local function parse(this, strict)
-  return parser(this, strict):apply()
-end
+local doc = xml.decode([=[
+<root>
+  <a><![CDATA[abc]]></a>
+  <b>abc<![CDATA[def]]></b>
+  <c><![CDATA[abc]]>def</c>
+  <d><![CDATA[abc]]]]>&gt;def</d>
+  <e><![CDATA[abc]]]]><![CDATA[>def]]></e>
+</root>
+]=])
 
-local class = {
-  element = element;
-  parse = parse;
-  selector = selector;
-  selection = selection;
-}
-
-function class.encode(v)
-  return element.encode(v)
-end
-
-function class.decode(s)
-  local v, matcher = parse(s)
-  if not matcher:eof() then
-    error("cannot reach eof at position " .. matcher.position)
-  end
-  return v
-end
-
-element.super = class
-
-return setmetatable(class, {
-  __index = xml;
-})
+assert(doc:query("a"):text() == "abc")
+assert(doc:query("b"):text() == "abcdef")
+assert(doc:query("d"):text() == "abc]]>def")
+assert(doc:query("e"):text() == "abc]]>def")
