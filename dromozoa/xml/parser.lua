@@ -103,7 +103,6 @@ function class:content()
       elseif this:lookahead("%<") then
         self:raise("invalid content")
       end
-
       local out = sequence_writer()
       while true do
         if this:match("\r\n") or this:match("[\r\n]") then
@@ -115,7 +114,10 @@ function class:content()
         elseif self:comment() then
           -- comment
         elseif this:match("%<%!%[CDATA%[(.-)%]%]%>") then
-          out:write(this[1])
+          local cdata = this[1]
+          if #cdata > 0 then
+            out:write(cdata)
+          end
         elseif this:lookahead("%<") then
           break
         else
