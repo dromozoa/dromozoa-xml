@@ -24,6 +24,8 @@ local doc = xml.decode([=[
   <c><![CDATA[abc]]>def</c>
   <d><![CDATA[abc]]]]>&gt;def</d>
   <e><![CDATA[abc]]]]><![CDATA[>def]]></e>
+  <f></f>
+  <g><![CDATA[]]></g>
 </root>
 ]=])
 
@@ -31,3 +33,5 @@ assert(doc:query("a"):text() == "abc")
 assert(doc:query("b"):text() == "abcdef")
 assert(doc:query("d"):text() == "abc]]>def")
 assert(doc:query("e"):text() == "abc]]>def")
+assert(doc:query("f"):count() == 0)
+assert(doc:query("g"):count() == 0)
