@@ -97,7 +97,7 @@ function class:content()
       that:push(stack:pop())
     elseif self:comment() then
       -- comment
-    elseif this:lookahead("<") then
+    elseif this:lookahead("%<") then
       self:raise("invalid content")
     else
       local out = sequence_writer()
@@ -110,7 +110,7 @@ function class:content()
           out:write(stack:pop())
         elseif self:comment() then
           -- comment
-        elseif this:lookahead("<") then
+        elseif this:lookahead("%<") then
           break
         else
           self:raise("invalid content")
@@ -172,7 +172,7 @@ end
 
 function class:comment()
   local this = self.this
-  if this:match("%<!%-%-") then
+  if this:match("%<%!%-%-") then
     while true do
       if this:match("%-%-%>") then
         return true
