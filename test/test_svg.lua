@@ -15,4 +15,14 @@
 -- You should have received a copy of the GNU General Public License
 -- along with dromozoa-xml.  If not, see <http://www.gnu.org/licenses/>.
 
+local xml = require "dromozoa.xml"
+local json = require "dromozoa.commons.json"
+
+local handle = assert(io.open "test/test.svg")
+local content = handle:read "*a"
+handle:close()
+
+local svg = xml.decode(content)
+local node = svg:query "#g2281 > path"
+assert(node:attr "d":find "^m 72,55%.207 h 6")
 
