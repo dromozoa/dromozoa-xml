@@ -1,4 +1,4 @@
--- Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2015,2016,2020 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-xml.
 --
@@ -61,7 +61,14 @@ end
 function class:element()
   local this = self.this
   local stack = self.stack
-  if this:match("<([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255]*)") then
+
+  local pattern
+  if self.strict then
+    pattern = "<([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255]*)"
+  else
+    pattern = "<([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255:]*)"
+  end
+  if this:match(pattern) then
     local name = this[1]
     self:attribute_list()
     local attributes = stack:pop()
@@ -80,8 +87,16 @@ function class:content()
   local this = self.this
   local stack = self.stack
   local that = sequence()
+
+  local pattern
+  if self.strict then
+    pattern = "</([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255]*)"
+  else
+    pattern = "</([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255:]*)"
+  end
+
   while true do
-    if this:match("</([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255]*)") then
+    if this:match(pattern) then
       local name = this[1]
       if this:match(ws .. ">") then
         local tag = stack:top()
@@ -135,8 +150,16 @@ function class:attribute_list()
   local this = self.this
   local stack = self.stack
   local that = linked_hash_table()
+
+  local pattern
+  if self.strict then
+    pattern = "([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255]*)"
+  else
+    pattern = "([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255:]*)"
+  end
+
   while true do
-    if not this:match(ws .. "([A-Za-z%_\128-\255][A-Za-z%_0-9%-%.\128-\255]*)") then
+    if not this:match(ws .. pattern) then
       break
     end
     local name = this[1]

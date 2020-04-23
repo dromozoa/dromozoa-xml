@@ -1,4 +1,4 @@
--- Copyright (C) 2016,2020 Tomoyuki Fujimori <moyu@dromozoa.com>
+-- Copyright (C) 2020 Tomoyuki Fujimori <moyu@dromozoa.com>
 --
 -- This file is part of dromozoa-xml.
 --
@@ -16,22 +16,13 @@
 -- along with dromozoa-xml.  If not, see <http://www.gnu.org/licenses/>.
 
 local xml = require "dromozoa.xml"
+local json = require "dromozoa.commons.json"
 
-local doc = xml.decode([=[
-<root>
-  <a><![CDATA[abc]]></a>
-  <b>abc<![CDATA[def]]></b>
-  <c><![CDATA[abc]]>def</c>
-  <d><![CDATA[abc]]]]>&gt;def</d>
-  <e><![CDATA[abc]]]]><![CDATA[>def]]></e>
-  <f></f>
-  <g><![CDATA[]]></g>
-</root>
-]=])
+local handle = assert(io.open "test/test.svg")
+local content = handle:read "*a"
+handle:close()
 
-assert(doc:query("a"):text() == "abc")
-assert(doc:query("b"):text() == "abcdef")
-assert(doc:query("d"):text() == "abc]]>def")
-assert(doc:query("e"):text() == "abc]]>def")
-assert(doc:query("f"):count() == 0)
-assert(doc:query("g"):count() == 0)
+local svg = xml.decode(content)
+local node = svg:query "#g2281 > path"
+assert(node:attr "d":find "^m 72,55%.207 h 6")
+
