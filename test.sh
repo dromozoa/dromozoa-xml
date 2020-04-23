@@ -1,6 +1,6 @@
 #! /bin/sh -e
 
-# Copyright (C) 2015 Tomoyuki Fujimori <moyu@dromozoa.com>
+# Copyright (C) 2015,2020 Tomoyuki Fujimori <moyu@dromozoa.com>
 #
 # This file is part of dromozoa-xml.
 #
@@ -16,6 +16,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with dromozoa-xml.  If not, see <http://www.gnu.org/licenses/>.
+
+LUA_PATH="?.lua;;"
+export LUA_PATH
 
 case x$1 in
   x) lua=lua;;

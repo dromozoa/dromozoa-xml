@@ -1,8 +1,8 @@
 package = "dromozoa-xml"
-version = "1.5-1"
+version = "1.6-1"
 source = {
-  url = "https://github.com/dromozoa/dromozoa-xml/archive/v1.5.tar.gz";
-  file = "dromozoa-xml-1.5.tar.gz";
+  url = "https://github.com/dromozoa/dromozoa-xml/archive/v1.6.tar.gz";
+  file = "dromozoa-xml-1.6.tar.gz";
 }
 description = {
   summary = "XML parser and toolkit";
